@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==3.1.3"
+djangorestframework = "==3.12.2"
+mysqlclient = "==2.0.1"
+django-mysql = "==3.9"
+pyjwt = "==1.7.1"
+django-cors-headers = "==3.5.0"
+django-dotenv = "==1.4.2"
+django-rest-swagger = "*"
+pylama = "*"
+pre-commit = "*"
+pillow = "*"
+openpyxl = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"

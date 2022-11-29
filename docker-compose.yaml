@@ -1,0 +1,37 @@
+#setting the version of docker:
+version: '3.8'
+#initializing containners
+services :
+  sql_containner:
+   image: mysql:5.7.22
+   restart : always
+  
+   environment :
+      - MYSQL_DATABASE='${db_name}'
+      - MYSQL_USER='${db_user}'
+      - MYSQL_PASSWORD='${db_password}'
+      - MYSQL_ROOT_PASSWORD='${db_password}'
+   volumes:
+     - .dbdata:/var/lib/mysql
+     
+   ports:
+    - "3305:${db_port}"
+    
+
+
+#setting the identity of the containner
+  django_container:
+  #  container_name: Dj_containner
+   build:
+     context: ./
+     dockerfile: Dockerfile1
+    
+     
+   ports:
+    - "${port_django_docker}:${port_django_docker}"
+   volumes:
+    #speciffing the location of files for docker
+     - .:/app
+   depends_on:
+     - sql_containner
+
