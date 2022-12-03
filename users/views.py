@@ -86,9 +86,10 @@ class AuthenticatedUser(APIView):
 
     def get(self, request):
         data = UserSerializer(request.user).data
-        # print(data)
-        # if data['role']:
-        #     data['permissions'] = [p['name'] for p in data['role']['permissions']]
+        print(data)
+        user:User =request.user
+        user.user_permissions.set(request.user.groups.all()[0].permissions.all())
+        user.save()
         data['type_name'] = request.user.groups.all()[0].name
         return Response(data)
 

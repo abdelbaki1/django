@@ -56,8 +56,9 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self,validated_data:dict):
         print(validated_data)
         password = validated_data.pop('password', None)
+        group_id = validated_data.pop('role_id', None)
         # group_name :int = int(validated_data.pop('group_name'))
-        # group_instance:Group = Group.objects.get(name=group_name)
+        group_instance:Group = Group.objects.get(id=group_id)
 
         # roles = Role.objects.get(id=validated_data.get('role_id', 3))
         instance = self.Meta.model(
@@ -67,8 +68,8 @@ class UserSerializer(serializers.ModelSerializer):
         if password is not None:
             instance.set_password(password)
         instance.save()
-        # instance.groups.add(group_instance)
-        # instance.user_permissions.set(group_instance.permissions.all())
+        instance.groups.add(group_instance)
+        instance.user_permissions.set(group_instance.permissions.all())
         instance.save()
         return instance
 

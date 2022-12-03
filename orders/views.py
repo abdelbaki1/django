@@ -1,5 +1,6 @@
 from openpyxl import Workbook,load_workbook
 from openpyxl.worksheet.table import Table
+from openpyxl.writer.excel import save_virtual_workbook
 import csv
 from django.db import connection
 from django.http import HttpResponse
@@ -90,31 +91,28 @@ class GetanOrder(
     lookup_url_kwarg = "pk"
 
 
-class ExportAPIView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
+class ExportAPIView(RetrieveAPIView):
     def get(self, request):
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="order.csv"'
-        orders = Order.objects.all()
-        writer = csv.writer(response)
-        writer.writerow(['ID', 'Name', 'Email', 'Product Title', 'Price', 'Quantity', '\n'])
+        count=1
+        orders  = Order.objects.all()
+        workbook =Workbook()
+        ws = workbook.active
+        ws.append(Order.fields())
+        # print("////////////////////",orders)
+        # writer = csv.writer(response)
+        # writer.writerow(['ID', 'Name', 'Email'])
         for order in orders:
-            print("order", order)
-            writer.writerow([order.id, order.name, order.email, '\n'])
-            orderItems = OrderItem.objects.all().filter(order_id=order.id)
-            print(orderItems)
-            for item in orderItems:
-                print("items", item)
-                writer.writerow(["    ", item.product_title, item.price, item.quantity, '\n'])
+            print("order=", order)
+            # writer.writerow([order.id, order.first_name, order.email])
+            ws.append([order.id, order.first_name, order.email])
+        response = HttpResponse(
+            content=save_virtual_workbook(workbook),
+            content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="order.xlsx"'
         return response
 
 
-class ChartAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
+class ChartAPIView(OrderGenericAPIView,RetrieveAPIView):
     def get(self, _):
         with connection.cursor() as cursor:
             cursor.execute("""
